@@ -168,26 +168,27 @@ def getAnalysis():
     j = int(0)  # spread step count
 
     for offer in loans['offers']:
-        orderDailyFee = orderDailyFee + Decimal(offer['amount']) * Decimal(offer['rate'])
-        coinsAboveQueue = coinsAboveQueue + Decimal(offer['amount'])
+    	orderDailyFee = orderDailyFee + Decimal(offer['amount']) * Decimal(offer['rate'])
+    	coinsAboveQueue = coinsAboveQueue + Decimal(offer['amount'])
 	avgQueueRate = orderDailyFee / coinsAboveQueue * 100
         j += 1
 	avgRate = avgQueueRate / 100
 	curRate = Decimal(offer['rate'])
 	if j < 15:
-	    rateFront = avgQueueRate    
-	
-	if  curRate >= minDailyRate:
-	    log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate) 
-            #print "\naverage rate = ", avgQueueRate, "%"
-            #print "total coins queue = ", coinsAboveQueue
-	    #log.analyzeOrders(,  		
-		else:
-	    log.analyzeOrders('unknown', 'BTC', rateFront, minDailyRate)
-	    break	
+    		rateFront = avgQueueRate
 
-    for test in lendingBalances:
-	 print lendingBalances[test]
+	while True:
+	
+		if curRate >= minDailyRate:
+			log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate) 
+        		#print "\naverage rate = ", avgQueueRate, "%"
+        		#print "total coins queue = ", coinsAboveQueue
+			#log.analyzeOrders(,  		
+		break
+	i += 1    
+	if i == len(loans['offers']):
+		log.analyzeOrders('unknown', 'BTC', rateFront, minDailyRate)
+
 
 def setAutoRenew(auto):
     i = int(0) #counter
