@@ -37,7 +37,7 @@ class Poloniex:
             ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnTradeHistory" + '&currencyPair=' + str(req['currencyPair']) ))
             return json.loads(ret.read())
         elif(command == "returnLoanOrders"):
-            ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnLoanOrders" + '&currency=' + str(req['currency'])+ '&limit=500'))
+            ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnLoanOrders" + '&currency=' + str(req['currency'])+ '&limit=300'))
             return json.loads(ret.read())
         else:
             req['command'] = command
