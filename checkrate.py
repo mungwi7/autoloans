@@ -176,14 +176,11 @@ def getAnalysis():
 	curRate = Decimal(offer['rate'])
 	if j < 15:
     		rateFront = avgQueueRate
-
-	while True:
-	
-		if curRate >= minDailyRate:
-			log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate) 
-        		#print "\naverage rate = ", avgQueueRate, "%"
-        		#print "total coins queue = ", coinsAboveQueue
-			#log.analyzeOrders(,  		
+	if curRate >= minDailyRate:
+		log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate) 
+        	#print "\naverage rate = ", avgQueueRate, "%"
+        	#print "total coins queue = ", coinsAboveQueue
+		#log.analyzeOrders(,  		
 		break
 	i += 1    
 	if i == len(loans['offers']):
