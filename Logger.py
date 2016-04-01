@@ -75,6 +75,10 @@ class Logger(object):
 		self.console.printline(line)
 		self.refreshStatus()
 
+	def analyzeOrders(self, amt, cur, rate, minrate):
+		line = self.timestamp() +  ' ' + str(amt) + ' ' + str(cur) + ' in front of minDailyRate ' + str(minrate) + '%' + ' first 15 in queue avg rate of ' + str(rate) + '%'
+		self.console.printline(line)
+
 	def cancelOrders(self, cur, msg):
 		line = self.timestamp() + ' Canceling all ' + str(cur) + ' orders... ' + self.digestApiMsg(msg)
 		self.console.printline(line)
