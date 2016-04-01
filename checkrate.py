@@ -8,7 +8,7 @@ SATOSHI = Decimal(10) ** -8
 
 config = SafeConfigParser()
 config_location = 'default.cfg'
-
+getcontext().prec=8
 defaultconfig =\
 """
 [API]
@@ -52,8 +52,8 @@ if len(loadedFiles) != 1:
         exit(0)
 
 
-sleepTime = float(os.getenv('SLEEPTIME',"1"))
-minDailyRate = Decimal(os.getenv('MINDAILY',"0.13"))/100
+sleepTime = float(os.getenv('SLEEPTIME',"5"))
+minDailyRate = Decimal(os.getenv('MINDAILY',"0.095"))/100
 maxDailyRate = Decimal(config.get("BOT","maxdailyrate"))/100
 spreadLend = int(os.getenv('SPREAD',"10"))
 gapBottom = Decimal(os.getenv('GAPBOTTOM',"5"))
@@ -156,39 +156,38 @@ def createLoanOffer(cur,amt,rate):
             msg = bot.createLoanOffer(cur,amt,days,0,rate)
             log.offer(amt, cur, rate, days, msg)
 
-def cancelAndLoanAll():
-
-
+def getAnalysis():
     lendingBalances = bot.returnAvailableAccountBalances("lending")['lending']
 
     loans = bot.returnLoanOrders('BTC')
-    s = Decimal(0)  # sum of coins on the top of loan orders
-    t = Decimal(0)
+    orderDailyFee = Decimal(0)  # sum of coins on the top of loan orders
+    coinsAboveQueue = Decimal(0)
+    avgQueueRate = Decimal(0)
+    curRate = Decimal(0)	    
     i = int(0)  # offer book iterator
     j = int(0)  # spread step count
 
-
     for offer in loans['offers']:
-        s = s + Decimal(offer['amount']) * Decimal(offer['rate'])
-
-        t = t + Decimal(offer['amount'])
-
-        t2 = t
+        orderDailyFee = orderDailyFee + Decimal(offer['amount']) * Decimal(offer['rate'])
+        coinsAboveQueue = coinsAboveQueue + Decimal(offer['amount'])
+	avgQueueRate = orderDailyFee / coinsAboveQueue * 100
         j += 1
-
-        if j > 5:
-            getcontext().prec = 6
-            print "\naverage rate = ", s / t * 100, "%"
-            print "total coins queue = ", t2
-            break
-
-
+	avgRate = avgQueueRate / 100
+	curRate = Decimal(offer['rate'])
+	if j < 15:
+	    rateFront = avgQueueRate    
+	
+	if  curRate >= minDailyRate:
+	    log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate) 
+            #print "\naverage rate = ", avgQueueRate, "%"
+            #print "total coins queue = ", coinsAboveQueue
+	    #log.analyzeOrders(,  		
+		else:
+	    log.analyzeOrders('unknown', 'BTC', rateFront, minDailyRate)
+	    break	
 
     for test in lendingBalances:
-        print lendingBalances[test]
-
-
-
+	 print lendingBalances[test]
 
 def setAutoRenew(auto):
     i = int(0) #counter
@@ -225,10 +224,10 @@ if autorenew == 1:
 
 while True:
     try:
-        refreshTotalLended()
-        log.refreshStatus(stringifyTotalLended())
-        cancelAndLoanAll()
-        time.sleep(sleepTime)
+        #refreshTotalLended()
+        #log.refreshStatus(stringifyTotalLended())
+        getAnalysis()
+	time.sleep(sleepTime)
     except Exception as e:
         log.log("ERROR: " + str(e))
         time.sleep(sleepTime)
