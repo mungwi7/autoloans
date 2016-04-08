@@ -19,7 +19,7 @@ class ConsoleOutput(object):
 		status = str(msg)
 		if msg != '' and len(status) > 99:
 			#truncate status, try preventing console bloating
-			status = str(msg)[:96] + '...' 
+			status = str(msg)[:96] + '...'
 		update = '\r'
 		update += status
 		update += ' ' * (len(self._status) - len(status))
@@ -32,7 +32,7 @@ class ConsoleOutput(object):
 		update += line + ' ' * (len(self._status) - len(line)) + '\n'
 		update += self._status
 		sys.stderr.write(update)
-		
+
 class JsonOutput(object):
 	def __init__(self, file, logLimit):
 		self.jsonOutputFile = file
@@ -46,7 +46,7 @@ class JsonOutput(object):
 
 	def printline(self, line):
 		self.jsonOutputLog.append(line)
-		
+
 	def writeJsonFile(self):
 		with io.open(self.jsonOutputFile, 'w', encoding='utf-8') as f:
 			self.jsonOutput["log"] = self.jsonOutputLog.get()
@@ -76,7 +76,7 @@ class Logger(object):
 		self.refreshStatus()
 
 	def analyzeOrders(self, amt, cur, rate, minrate):
-		line = self.timestamp() +  ' ' + str(amt) + ' ' + str(cur) + ' in front of minDailyRate ' + str(minrate) + '%' + ' first 15 in queue avg rate of ' + str(rate) + '%'
+		line = self.timestamp() +  ' ' + str(amt) + ' ' + str(rate) + '%'
 		self.console.printline(line)
 
 	def cancelOrders(self, cur, msg):
@@ -86,9 +86,9 @@ class Logger(object):
 
 	def refreshStatus(self, lended=''):
 		if lended != '':
-			self._lended = lended;		
+			self._lended = lended;
 		self.console.status(self._lended, self.timestamp())
-		
+
 	def digestApiMsg(self, msg):
 		try:
 			m = (msg['message'])

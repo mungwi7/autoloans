@@ -52,8 +52,8 @@ if len(loadedFiles) != 1:
         exit(0)
 
 
-sleepTime = float(os.getenv('SLEEPTIME',"5"))
-minDailyRate = Decimal(os.getenv('MINDAILY',"0.095"))/100
+sleepTime = float(os.getenv('SLEEPTIME',"60"))
+minDailyRate = Decimal(os.getenv('MINDAILY',"0.07005"))/100
 maxDailyRate = Decimal(config.get("BOT","maxdailyrate"))/100
 spreadLend = int(os.getenv('SPREAD',"10"))
 gapBottom = Decimal(os.getenv('GAPBOTTOM',"5"))
@@ -157,15 +157,20 @@ def createLoanOffer(cur,amt,rate):
             log.offer(amt, cur, rate, days, msg)
 
 def getAnalysis():
-    lendingBalances = bot.returnAvailableAccountBalances("lending")['lending']
+    #lendingBalances = bot.returnAvailableAccountBalances("lending")['lending']
 
     loans = bot.returnLoanOrders('BTC')
     orderDailyFee = Decimal(0)  # sum of coins on the top of loan orders
     coinsAboveQueue = Decimal(0)
     avgQueueRate = Decimal(0)
-    curRate = Decimal(0)	    
+    curRate = Decimal(0)
     i = int(0)  # offer book iterator
     j = int(0)  # spread step count
+
+    openLoans = bot.returnLoanOrders('BTC')
+    for offer in openLoans['offers']:
+	this = 1
+
 
     for offer in loans['offers']:
     	orderDailyFee = orderDailyFee + Decimal(offer['amount']) * Decimal(offer['rate'])
@@ -174,15 +179,15 @@ def getAnalysis():
         j += 1
 	avgRate = avgQueueRate / 100
 	curRate = Decimal(offer['rate'])
-	if j < 15:
+	if coinsAboveQueue < 20:
     		rateFront = avgQueueRate
 	if curRate >= minDailyRate:
-		log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate) 
+		log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate)
         	#print "\naverage rate = ", avgQueueRate, "%"
         	#print "total coins queue = ", coinsAboveQueue
-		#log.analyzeOrders(,  		
+		#log.analyzeOrders(,
 		break
-	i += 1    
+	i += 1
 	if i == len(loans['offers']):
 		log.analyzeOrders('unknown', 'BTC', rateFront, minDailyRate)
 
