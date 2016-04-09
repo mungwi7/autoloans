@@ -83,7 +83,7 @@ if minDailyRate < 0.00003 or minDailyRate > 0.05: # 0.003% daily is 1% yearly
 if maxDailyRate < 0.00003 or maxDailyRate > 0.05:
 	print "maxdaily rate is set too low or too high, must be 0.003-5%"
 	exit(1)
-if spreadLend < 1 or spreadLend > 20:
+if spreadLend < 1 or spreadLend > 999:
 	print "spreadlend value must be 1-20 range"
 	exit(1)
 
