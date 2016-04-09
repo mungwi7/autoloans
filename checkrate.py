@@ -160,39 +160,54 @@ def getAnalysis():
     #lendingBalances = bot.returnAvailableAccountBalances("lending")['lending']
 
     loans = bot.returnLoanOrders('BTC')
-    orderDailyFee = Decimal(0)  # sum of coins on the top of loan orders
-    coinsAboveQueue = Decimal(0)
-    avgQueueRate = Decimal(0)
+    orderdailyfee = Decimal(0)  # sum of coins on the top of loan orders
+    coinsabovequeue = Decimal(0)
+    avgqueuerate = Decimal(0)
+    ratefront = Decimal(0)
     curRate = Decimal(0)
     i = int(0)  # offer book iterator
     j = int(0)  # spread step count
 
     openLoans = bot.returnLoanOrders('BTC')
     for offer in openLoans['offers']:
-	this = 1
+    this = 1
 
 
     for offer in loans['offers']:
-    	orderDailyFee = orderDailyFee + Decimal(offer['amount']) * Decimal(offer['rate'])
-    	coinsAboveQueue = coinsAboveQueue + Decimal(offer['amount'])
-	avgQueueRate = orderDailyFee / coinsAboveQueue * 100
+        orderdailyfee = orderdailyfee + Decimal(offer['amount']) * Decimal(offer['rate'])
+        coinsabovequeue = coinsabovequeue + Decimal(offer['amount'])
+        avgqueuerate = orderdailyfee / coinsabovequeue * 100
         j += 1
-	avgRate = avgQueueRate / 100
-	curRate = Decimal(offer['rate'])
-	if coinsAboveQueue < 20:
-    		rateFront = avgQueueRate
-	if curRate >= minDailyRate:
-		log.analyzeOrders(coinsAboveQueue, 'BTC', rateFront, minDailyRate)
-        	#print "\naverage rate = ", avgQueueRate, "%"
-        	#print "total coins queue = ", coinsAboveQueue
-		#log.analyzeOrders(,
-		break
-	i += 1
-	if i == len(loans['offers']):
-		log.analyzeOrders('unknown', 'BTC', rateFront, minDailyRate)
+        avgRate = avgqueuerate / 100
+        curRate = Decimal(offer['rate'])
+            if coinsabovequeue < 20:
+                ratefront = avgqueuerate
+
+        i += 1
+        if i == len(loans['offers']):
+            log.analyzeOrders(coinsabovequeue, 'BTC', ratefront, minDailyRate)
 
 
 def setAutoRenew(auto):
+    i = int(0) #counter
+    try:
+        action = 'Clearing'
+        if(auto == 1):
+            action = 'Setting'
+        log.log(action + ' AutoRenew...(Please Wait)')
+        cryptoLended = bot.returnActiveLoans()
+        loansCount = len(cryptoLended["provided"])
+        for item in cryptoLended["provided"]:
+            if int(item["autoRenew"]) != auto:
+                log.refreshStatus('Processing AutoRenew - ' + str(i) + ' of ' + str(loansCount) + ' loans')
+                bot.toggleAutoRenew(int(item["id"]))
+                i += 1
+    except KeyboardInterrupt:
+        log.log('Toggled AutoRenew for ' +  str(i) + ' loans')
+        raise SystemExit
+    log.log('Toggled AutoRenew for ' +  str(i) + ' loans')
+
+def setRenew(auto):
     i = int(0) #counter
     try:
         action = 'Clearing'
@@ -230,7 +245,7 @@ while True:
         #refreshTotalLended()
         #log.refreshStatus(stringifyTotalLended())
         getAnalysis()
-	time.sleep(sleepTime)
+    time.sleep(sleepTime)
     except Exception as e:
         log.log("ERROR: " + str(e))
         time.sleep(sleepTime)

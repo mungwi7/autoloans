@@ -52,14 +52,16 @@ if len(loadedFiles) != 1:
 		exit(0)
 
 
-sleepTime = float(os.getenv('SLEEPTIME',"60"))
-minDailyRate = Decimal(os.getenv('MINDAILY',"0.13"))/100
+sleepTime = float(os.getenv('SLEEPTIME',"160"))
+minDailyRate = Decimal(os.getenv('MINDAILY',"0.07249"))/100
 maxDailyRate = Decimal(config.get("BOT","maxdailyrate"))/100
 spreadLend = int(os.getenv('SPREAD',"10"))
 gapBottom = Decimal(os.getenv('GAPBOTTOM',"5"))
 gapTop = Decimal(os.getenv('GAPTOP',"15"))
 sixtyDayThreshold = float(os.getenv('THRESH',"0.2"))/100
 autorenew = int(os.getenv('AUTORENEW',"0"))
+apikey = str(os.getenv('APIKEY', ''))
+secret = str(os.getnev('SECRET',''))
 
 try:
 	coincfg = {} #parsed
@@ -96,7 +98,7 @@ def timestamp():
 	ts = time.time()
 	return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
-bot = Poloniex(config.get("API","apikey"), config.get("API","secret"))
+bot = Poloniex(apikey, secret)
 log = Logger()
 
 # check if json output is enabled
