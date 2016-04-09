@@ -61,7 +61,7 @@ gapTop = Decimal(os.getenv('GAPTOP',"15"))
 sixtyDayThreshold = float(os.getenv('THRESH',"0.2"))/100
 autorenew = int(os.getenv('AUTORENEW',"0"))
 apikey = str(os.getenv('APIKEY', ''))
-secret = str(os.getnev('SECRET',''))
+secret = str(os.getenv('SECRET',''))
 
 try:
 	coincfg = {} #parsed
